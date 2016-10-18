@@ -1,4 +1,4 @@
-(function(window, document) {
+let createDatepicker = (function(window, document) {
     const MONTHS_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const DATEPICKER_HTML = `
         <div class="datepicker-header">
@@ -34,28 +34,34 @@
     class Datepicker {
         /**
          * Datepicker construction
+         * Month should be in range of 1-12 and day should be in range of 1-31
+         *
+         * @param element DOM element to which datepicker instance is attached
+         * @param year Initial year value
+         * @param month Initial month value
+         * @param day Initial day value
+         * @param format Formatting callback
+         * @param datepickerWindow Instance of DatepickerWindow
          */
-        constructor(element, datepickerWindow) {
+        constructor(element, year, month, day, format, datepickerWindow) {
             let date = new Date();
 
             this._element = element;
             this._datepickerWindow = datepickerWindow;
-            this._year = date.getFullYear();
-            this._month = date.getMonth();
-            this._day = date.getDate() - 1;
+            this._year = year;
+            this._month = month - 1;
+            this._day = day;
+            this._format = format;
 
-            element.addEventListener('click', e => {
+            this._element.addEventListener('datepicker.show', e => {
                 e.stopPropagation();
 
-                datepickerWindow.show(this);
+                datepickerWindow.show(
+                    this,
+                    this._element.offsetLeft + window.scrollX + 'px',
+                    this._element.offsetTop + element.clientHeight + 4 + window.scrollY + 'px'
+                );
             });
-        }
-
-        /**
-         * Element getter
-         */
-        getElement() {
-            return this._element;
         }
 
         /**
@@ -87,7 +93,8 @@
             this._month = this._datepickerWindow.getMonth();
             this._day = this._datepickerWindow.getDay();
 
-            this._element.value = this._year + '.' + (this._month + 1) + '.' + (this._day + 1);
+            let changeDateEvent = new CustomEvent('datepicker.change', {detail: this._format(this._year, this._month, this._day)});
+            this._element.dispatchEvent(changeDateEvent);
             this._datepickerWindow.hide();
         }
     }
@@ -109,10 +116,9 @@
             this._month = 0;
 
             let todayDate = new Date();
-            this._currentDay = todayDate.getDate() - 1;
+            this._currentDay = todayDate.getDate();
             this._currentMonth = todayDate.getMonth();
             this._currentYear = todayDate.getFullYear();
-            console.log(this);
 		}
 
         /**
@@ -132,8 +138,6 @@
          * Create window element
          */
         _makeWindow() {
-            console.log('creating window');
-
             let datepickerWindow = document.createElement('div');
             this._datepickerWindow = datepickerWindow;
             datepickerWindow.classList.add('datepicker-window');
@@ -171,13 +175,12 @@
         /**
          * Display window
          */
-        show(datepicker) {
+        show(datepicker, posX, posY) {
             this._currentDatepicker = datepicker;
             this._datepickerWindow.style.display = 'block';
 
-            let element = datepicker.getElement();
-            this._datepickerWindow.style.left = element.offsetLeft + window.scrollX + 'px';
-            this._datepickerWindow.style.top = element.offsetTop + element.clientHeight + 4 + window.scrollY + 'px';
+            this._datepickerWindow.style.left = posX;
+            this._datepickerWindow.style.top = posY;
 
             this._day = datepicker.getDay();
             this._month = datepicker.getMonth();
@@ -244,13 +247,13 @@
             }
 
             let daysInMonth = (new Date(this._year, this._month + 1, 0)).getDate();
-            for (let day = 0; day < daysInMonth; day++) {
+            for (let day = 1; day <= daysInMonth; day++) {
                 row.appendChild(this._renderDayCell(day));
                 dayOfWeek++;
 
                 if (dayOfWeek == 7) {
                     this._daysContent.appendChild(row);
-                    row = day == daysInMonth - 1 ? null : document.createElement('tr');
+                    row = day == daysInMonth ? null : document.createElement('tr');
                     dayOfWeek = 0;
                 }
             }
@@ -272,13 +275,16 @@
             let link = document.createElement('a');
             link.href = '#';
             link.setAttribute('date-day', day);
-            link.innerHTML = day + 1;
+            link.innerHTML = day;
+
             if (this._currentDatepicker.getYear() === this._year && this._currentDatepicker.getMonth() === this._month && this._currentDatepicker.getDay() === day) {
                 link.classList.add('selected');
             }
+
             if (this._currentYear === this._year && this._currentMonth === this._month && this._currentDay === day) {
                 link.classList.add('today');
-            }           
+            }
+
 
             cell.appendChild(link);
 
@@ -316,8 +322,55 @@
         }
     }
 
-    let datepickerWindow = new DatepickerWindow();
+    let datepickerWindow = null;
 
-    let picker1 = new Datepicker(document.querySelector('#target1'), datepickerWindow);
-    let picker2 = new Datepicker(document.querySelector('#target2'), datepickerWindow);
+    return function(element, year, month, day, format) {
+        datepickerWindow = datepickerWindow || new DatepickerWindow();
+
+        return new Datepicker(element, year, month, day, format, datepickerWindow);
+    }
 })(window, document);
+
+/**
+ * Formatting function
+ */
+function format(year, month, day) {
+    return year + '.' + (month + 1) + '.' + day;
+}
+
+// First input
+
+let input1 = document.querySelector('#target1');
+let picker1 = createDatepicker(input1, 2016, 11, 1, format);
+
+input1.addEventListener('click', e => {
+    e.stopPropagation();
+
+    let showDatepickerEvent = new CustomEvent('datepicker.show');
+    input1.dispatchEvent(showDatepickerEvent);
+});
+
+input1.addEventListener('datepicker.change', e => {
+    e.stopPropagation();
+
+    input1.value = e.detail;
+});
+
+
+// Second input
+
+let input2 = document.querySelector('#target2');
+let picker2 = createDatepicker(input2, 2016, 10, 1, format);
+
+input2.addEventListener('click', e => {
+    e.stopPropagation();
+
+    let showDatepickerEvent = new CustomEvent('datepicker.show');
+    input2.dispatchEvent(showDatepickerEvent);
+});
+
+input2.addEventListener('datepicker.change', e => {
+    e.stopPropagation();
+
+    input2.value = e.detail;
+});
