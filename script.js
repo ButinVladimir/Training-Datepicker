@@ -22,7 +22,7 @@ let createDatepicker = (function(window, document) {
                         <th>We</th>
                         <th>Th</th>
                         <th>Fr</th>
-                        <th>Ss</th>
+                        <th>Sa</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -272,7 +272,7 @@ let createDatepicker = (function(window, document) {
             let row = document.createElement('tr');
             let dayOfWeek = (new Date(this._year, this._month, 1)).getDay();
 
-            for (let i = 0; i < dayOfWeek; i++) {
+            for (let offset = 0; offset < dayOfWeek; offset++) {
                 row.appendChild(this._renderEmptyDayCell());
             }
 
@@ -289,7 +289,7 @@ let createDatepicker = (function(window, document) {
             }
 
             if (dayOfWeek !== 0) {
-                for (let i = dayOfWeek; i < 7; i++) {
+                for (let offset = dayOfWeek; offset < 7; offset++) {
                     row.appendChild(this._renderEmptyDayCell());
                 }
                 this._daysContent.appendChild(row);
