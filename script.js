@@ -107,8 +107,7 @@ let createDatepicker = (function(window, document) {
          * Window constructor function
          */
         constructor() {
-            this._makeWindow();
-            this._registerWindowClickHandler();
+            this._datepickerWindow = null;
             this._currentDatepicker = null;
 
             this._day = 0;
@@ -122,60 +121,35 @@ let createDatepicker = (function(window, document) {
 		}
 
         /**
-         * Register global window click handler
+         * Day getter
          */
-        _registerWindowClickHandler() {
-            this._datepickerWindow.addEventListener('click', e => { e.stopPropagation(); });
-
-            document.addEventListener('click', e => {
-                e.stopPropagation();
-
-                this.hide();
-            });
+        getDay() {
+            return this._day;
         }
 
         /**
-         * Create window element
+         * Month getter
          */
-        _makeWindow() {
-            let datepickerWindow = document.createElement('div');
-            this._datepickerWindow = datepickerWindow;
-            datepickerWindow.classList.add('datepicker-window');
-            datepickerWindow.innerHTML = DATEPICKER_HTML;
+        getMonth() {
+            return this._month;
+        }
 
-            this._prevMonthButton = datepickerWindow.querySelector('.datepicker-prev-month-button');
-            this._prevMonthButton.addEventListener('click', e => {
-                e.stopPropagation();
-                e.preventDefault();
-
-                this._prevMonth();
-            });
-
-            this._nextMonthButton = datepickerWindow.querySelector('.datepicker-next-month-button');
-            this._nextMonthButton.addEventListener('click', e => {
-                e.stopPropagation();
-                e.preventDefault();
-
-                this._nextMonth();
-            });
-
-            this._monthCaption = datepickerWindow.querySelector('.datepicker-month-caption');
-            this._daysContent = datepickerWindow.querySelector('.datepicker-days tbody');
-            this._daysContent.addEventListener('click', e => {
-                e.stopPropagation();
-                e.preventDefault();
-
-                this._day = +e.target.getAttribute('date-day');
-                this._currentDatepicker.changeDate();
-            });
-
-            document.body.appendChild(datepickerWindow);
+        /**
+         * Year getter
+         */
+        getYear() {
+            return this._year;
         }
 
         /**
          * Display window
          */
         show(datepicker, posX, posY) {
+            if (this._datepickerWindow === null) {
+                this._renderWindow();
+                this._registerHandlers();
+            }
+
             this._currentDatepicker = datepicker;
             this._datepickerWindow.style.display = 'block';
 
@@ -196,6 +170,62 @@ let createDatepicker = (function(window, document) {
         hide() {
             this._currentDatepicker = null;
             this._datepickerWindow.style.display = 'none';
+        }
+
+        /**
+         * Render window element
+         */
+        _renderWindow() {
+            let datepickerWindow = document.createElement('div');
+            this._datepickerWindow = datepickerWindow;
+            datepickerWindow.classList.add('datepicker-window');
+            datepickerWindow.innerHTML = DATEPICKER_HTML;
+
+            this._prevMonthButton = datepickerWindow.querySelector('.datepicker-prev-month-button');
+            this._nextMonthButton = datepickerWindow.querySelector('.datepicker-next-month-button');
+
+            this._monthCaption = datepickerWindow.querySelector('.datepicker-month-caption');
+            this._daysContent = datepickerWindow.querySelector('.datepicker-days tbody');
+
+            document.body.appendChild(datepickerWindow);
+        }
+
+        /**
+         * Register handlers
+         */
+        _registerHandlers() {
+            this._datepickerWindow.addEventListener('click', e => { e.stopPropagation(); });
+
+            document.addEventListener('click', e => {
+                e.stopPropagation();
+
+                this.hide();
+            });
+
+            this._prevMonthButton.addEventListener('click', e => {
+                e.stopPropagation();
+                e.preventDefault();
+
+                this._prevMonth();
+            });
+
+            this._nextMonthButton.addEventListener('click', e => {
+                e.stopPropagation();
+                e.preventDefault();
+
+                this._nextMonth();
+            });
+
+            this._daysContent.addEventListener('click', e => {
+                e.stopPropagation();
+                e.preventDefault();
+
+                let day = +e.target.getAttribute('date-day');
+                if (day !== 0) {
+                    this._day = +e.target.getAttribute('date-day');
+                    this._currentDatepicker.changeDate();
+                }
+            });
         }
 
         /**
@@ -298,27 +328,6 @@ let createDatepicker = (function(window, document) {
             let cell = document.createElement('td');
 
             return cell;
-        }
-
-        /**
-         * Day getter
-         */
-        getDay() {
-            return this._day;
-        }
-
-        /**
-         * Month getter
-         */
-        getMonth() {
-            return this._month;
-        }
-
-        /**
-         * Year getter
-         */
-        getYear() {
-            return this._year;
         }
     }
 
