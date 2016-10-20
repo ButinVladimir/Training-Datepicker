@@ -1,5 +1,12 @@
 let createDatepicker = (function(window, document) {
+    /**
+     * Months names
+     */
     const MONTHS_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    
+    /**
+     * Window template
+     */
     const DATEPICKER_HTML = `
         <div class="datepicker-header">
             <a href="#" class="datepicker-month-button datepicker-prev-month-button">
@@ -36,12 +43,12 @@ let createDatepicker = (function(window, document) {
          * Datepicker construction
          * Month should be in range of 1-12 and day should be in range of 1-31
          *
-         * @param element DOM element to which datepicker instance is attached
-         * @param year Initial year value
-         * @param month Initial month value
-         * @param day Initial day value
-         * @param format Formatting callback
-         * @param datepickerWindow Instance of DatepickerWindow
+         * @param {Object} element - DOM element to which datepicker instance is attached
+         * @param {Number} year - Initial year value
+         * @param {Number} month - Initial month value
+         * @param {Number} day - Initial day value
+         * @param {Function} format - Formatting callback
+         * @param {DatepickerWindow} datepickerWindow - Instance of DatepickerWindow
          */
         constructor(element, year, month, day, format, datepickerWindow) {
             let date = new Date();
