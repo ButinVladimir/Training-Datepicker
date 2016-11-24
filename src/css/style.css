@@ -3,8 +3,8 @@
 	border: 1px solid #AAA;
 	border-radius: 3px;
 	display: none;
-	position: absolute;;
 	padding: 3px;
+	position: absolute;;
 }
 
 .datepicker-window .datepicker-header {
@@ -16,12 +16,12 @@
 }
 
 .datepicker-window .datepicker-header .datepicker-month-button {
-	text-decoration: none;
-	font-size: 1.5em;
 	border: 1px solid #F5F5F5;
 	color: black;
-	padding: 0 0.5em 0 0.5em;
 	display: inline-block;
+	font-size: 1.5em;
+	padding: 0 .5em;
+	text-decoration: none;
 }
 
 .datepicker-window .datepicker-header .datepicker-month-button:hover {
@@ -44,10 +44,10 @@
 }
 
 .datepicker-window .datepicker-days {
-	margin-top: 3px;
 	background-color: #F5F5F5;
 	border: 1px solid #AAA;
 	border-radius: 3px;
+	margin-top: 3px;
 }
 
 .datepicker-window .datepicker-days-table {
@@ -64,21 +64,21 @@
 }
 
 .datepicker-window .datepicker-days-table td a {
-	font-size: 1.1em;
 	border: 1px solid #AAA;
 	border-radius: 3px;
-	display: block;
-	text-decoration: none;
 	color: black;
+	display: block;
+	font-size: 1.1em;
 	padding: 3px 12px 3px 12px;
+	text-decoration: none;
 }
 
-.datepicker-window .datepicker-days-table td a.selected {
+.datepicker-window .datepicker-days-table td .selected {
 	background-color: #5F5FF0;
 	color: white;
 }
 
-.datepicker-window .datepicker-days-table td a.today {
+.datepicker-window .datepicker-days-table td .today {
 	background-color: #F0F05F;
 	color: black;
 }
@@ -86,4 +86,8 @@
 .datepicker-window .datepicker-days-table td a:hover {
 	background-color: white;
 	color: black;
+}
+
+#template {
+	display: none;
 }
